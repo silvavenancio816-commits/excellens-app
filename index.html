@@ -1,268 +1,36 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Excellens Pro Ultra</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <style>
-        :root { --primary: #002060; --gold: #FFC000; --orange: #FF6B00; }
-        body { background: white; color: var(--primary); font-family: sans-serif; overflow: hidden; height: 100vh; margin: 0; }
-        .bg-gold { background: var(--gold); }
-        .text-gold { color: var(--gold); }
-        .scanner-line { height: 3px; background: var(--gold); position: absolute; width: 100%; animation: scan 2s infinite linear; box-shadow: 0 0 15px var(--gold); z-index: 50; }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-        .active-tap:active { transform: scale(0.95); }
-    </style>
+  <meta charset="UTF-8">
+  <title>Excellens Colaborador</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-<body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect } = React;
 
-        const CONFIG = {
-            empresa: "CLEAM APOIO OPERACIONAL",
-            unidade: "FAZENDA NOVA PIRATININGA",
-            municipio: "SÃO MIGUEL DO ARAGUAIA / GO",
-            cnpj: "29.785.549/0013-50",
-            slogan: "PRAZER EM SERVI-LOS",
-            adminPass: "1234"
-        };
+<body class="bg-gray-100">
+  <div id="root"></div>
 
-        const Storage = {
-            getUsers: () => JSON.parse(localStorage.getItem("ex_v3_users") || "[]"),
-            saveUsers: (u) => localStorage.setItem("ex_v3_users", JSON.stringify(u)),
-            getLogs: () => JSON.parse(localStorage.getItem("ex_v3_logs") || "[]"),
-            addLog: (l) => { 
-                const logs = Storage.getLogs(); 
-                logs.push(l); 
-                localStorage.setItem("ex_v3_logs", JSON.stringify(logs)); 
-            }
-        };
+  <script>
+    const App = () => {
+      return React.createElement(
+        "div",
+        { className: "p-4 text-center" },
+        "Excellens Colaborador carregado com sucesso"
+      );
+    };
 
-        const App = () => {
-            const [view, setView] = useState("splash");
-            const [user, setUser] = useState(null);
-            const [time, setTime] = useState(new Date());
-            const [isScanning, setIsScanning] = useState(false);
-            const [pendingAction, setPendingAction] = useState(null);
-
-            useEffect(() => {
-                const t = setInterval(() => setTime(new Date()), 1000);
-                if(view === "splash") setTimeout(() => setView("home"), 2500);
-                return () => clearInterval(t);
-            }, [view]);
-
-            const checkAuth = (action) => { 
-                setPendingAction(() => action); 
-                setView("auth_confirm"); 
-            };
-
-            if(view === "splash") return (
-                <div className="h-screen flex flex-col items-center justify-center bg-white">
-                    <div className="w-20 h-20 bg-gold rounded-[1.5rem] flex items-center justify-center mb-6 shadow-xl animate-pulse">
-                        <i className="fa-solid fa-utensils text-white text-3xl"></i>
-                    </div>
-                    <h1 className="text-4xl font-black italic text-[#002060]">EXCELLENS</h1>
-                    <p className="text-gold font-bold tracking-[0.3em] text-[10px] mt-2 uppercase">{CONFIG.slogan}</p>
-                </div>
-            );
-
-            if(view === "home") return (
-                <div className="h-screen flex flex-col bg-[#F8FBFF]">
-                    <div className="p-8 pt-16 flex justify-between items-center bg-white border-b border-blue-100 shadow-sm">
-                        <div>
-                            <p className="text-[#002060] text-[10px] font-black uppercase tracking-widest">{CONFIG.empresa}</p>
-                            <h2 className="text-2xl font-black text-blue-900">Bom dia!</h2>
-                        </div>
-                        <div className="w-12 h-12 bg-gold rounded-xl flex items-center justify-center shadow-lg"><i className="fa-solid fa-utensils text-white"></i></div>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center justify-center text-center">
-                        <h3 className="text-8xl font-mono font-black text-[#002060] tracking-tight">{time.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}</h3>
-                        <p className="text-blue-500 uppercase tracking-[0.3em] font-black text-[10px] mt-2">{time.toLocaleDateString("pt-BR", {weekday:"long", day:"numeric", month:"long"})}</p>
-                        <button onClick={() => setView("user_list")} className="mt-16 group relative active-tap">
-                            <div className="absolute inset-0 bg-gold blur-3xl opacity-30 animate-pulse"></div>
-                            <div className="relative w-40 h-40 bg-gold rounded-[3rem] flex items-center justify-center shadow-2xl border-4 border-white">
-                                <i className="fa-solid fa-fingerprint text-[#002060] text-7xl"></i>
-                            </div>
-                            <p className="mt-8 font-black text-[#002060] tracking-widest text-sm animate-pulse">BATER PONTO</p>
-                        </button>
-                    </div>
-                    <div className="p-10 text-center">
-                        <button onClick={() => setView("admin_login")} className="text-blue-200 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-full border border-blue-100 bg-white">Painel Administrativo</button>
-                    </div>
-                </div>
-            );
-
-            if(view === "user_list") return (
-                <div className="h-screen bg-white flex flex-col">
-                    <div className="bg-[#002060] p-12 pt-20 rounded-b-[4rem] text-white shadow-2xl">
-                        <button onClick={() => setView("home")} className="mb-8 active-tap"><i className="fa-solid fa-arrow-left text-2xl"></i></button>
-                        <h2 className="text-3xl font-black italic">Colaboradores</h2>
-                        <p className="text-gold font-bold text-sm">Selecione para identificar o ponto</p>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                        {Storage.getUsers().length === 0 && <p className="text-center py-20 text-blue-200 font-bold uppercase text-xs">Nenhum funcionário cadastrado</p>}
-                        {Storage.getUsers().map(u => (
-                            <button key={u.id} onClick={() => { setUser(u); setView("actions"); }} className="w-full bg-blue-50/50 p-5 rounded-[2.5rem] flex items-center gap-5 border border-blue-50 active-tap">
-                                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white border-2 border-gold shadow-sm flex-shrink-0">
-                                    {u.foto ? <img src={u.foto} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gold"><i className="fa-solid fa-user text-2xl"></i></div>}
-                                </div>
-                                <div className="text-left flex-1">
-                                    <p className="font-black text-[#002060] text-lg uppercase leading-tight">{u.nome}</p>
-                                    <p className="text-[10px] font-black text-blue-400 tracking-widest uppercase">{u.funcao}</p>
-                                </div>
-                                <i className="fa-solid fa-chevron-right text-blue-100"></i>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            );
-
-            if(view === "actions") return (
-                <div className="h-screen bg-white flex flex-col">
-                    {isScanning && (
-                        <div className="fixed inset-0 z-50 bg-[#002060] flex flex-col items-center justify-center p-10">
-                            <div className="relative w-64 h-80 border-4 border-gold/30 rounded-[3rem] overflow-hidden">
-                                <div className="scanner-line"></div>
-                                <i className="fa-solid fa-fingerprint text-9xl text-gold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10"></i>
-                            </div>
-                            <h2 className="text-gold font-black text-2xl mt-12 animate-pulse italic">AUTENTICANDO...</h2>
-                        </div>
-                    )}
-                    <div className="bg-[#002060] p-12 pt-20 rounded-b-[4.5rem] text-center shadow-2xl">
-                        <button onClick={() => setView("user_list")} className="absolute top-16 left-8 text-white active-tap"><i className="fa-solid fa-arrow-left text-xl"></i></button>
-                        <div className="w-28 h-28 mx-auto mb-6 relative">
-                            <div className="w-full h-full rounded-[2rem] overflow-hidden border-4 border-gold shadow-xl bg-white">
-                                {user.foto ? <img src={user.foto} className="w-full h-full object-cover" /> : <i className="fa-solid fa-user text-blue-100 text-5xl mt-5"></i>}
-                            </div>
-                        </div>
-                        <h2 className="text-3xl font-black text-white italic">{user.nome}</h2>
-                        <p className="text-gold font-bold text-xs mt-1 uppercase tracking-widest">{user.funcao}</p>
-                    </div>
-                    <div className="flex-1 grid grid-cols-2 gap-4 p-8 content-center">
-                        {[
-                            {id: "Entrada", icon: "fa-sun", color: "bg-blue-50 text-blue-700"},
-                            {id: "Almoço", icon: "fa-utensils", color: "bg-blue-50 text-blue-700"},
-                            {id: "Retorno", icon: "fa-clock-rotate-left", color: "bg-blue-50 text-blue-700"},
-                            {id: "Saída", icon: "fa-moon", color: "bg-blue-50 text-blue-700"}
-                        ].map(it => (
-                            <button key={it.id} onClick={() => {
-                                setIsScanning(true);
-                                setTimeout(() => {
-                                    Storage.addLog({userId: user.id, nome: user.nome, tipo: it.id, data: new Date().toISOString()});
-                                    setIsScanning(false); setView("home");
-                                }, 2000);
-                            }} className={`${it.color} h-36 rounded-[2.5rem] flex flex-col items-center justify-center gap-3 border border-blue-100 shadow-sm active-tap`}>
-                                <i className={`fa-solid ${it.icon} text-3xl`}></i>
-                                <span className="font-black text-[10px] tracking-widest uppercase">{it.id}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            );
-
-            if(view === "auth_confirm") return (
-                <div className="h-screen bg-[#002060]/95 flex flex-col items-center justify-center p-8 backdrop-blur-lg">
-                    <div className="bg-white p-12 rounded-[3.5rem] w-full max-w-sm text-center shadow-2xl border-4 border-gold">
-                        <i className="fa-solid fa-lock text-5xl text-gold mb-6"></i>
-                        <h2 className="text-[#002060] font-black text-xl mb-8 uppercase">Acesso Restrito</h2>
-                        <input type="password" autoFocus placeholder="PIN" className="w-full bg-blue-50 p-6 rounded-2xl text-center text-4xl text-[#002060] mb-8 font-mono" 
-                          onChange={e => { if(e.target.value === CONFIG.adminPass) { pendingAction(); setView("admin"); } }} />
-                        <button onClick={() => setView("admin")} className="text-slate-400 font-black text-[10px] uppercase">Cancelar</button>
-                    </div>
-                </div>
-            );
-
-            if(view === "admin_login") return (
-                <div className="h-screen bg-[#002060] flex flex-col items-center justify-center p-8">
-                    <div className="bg-white/10 p-12 rounded-[4rem] w-full max-w-sm text-center border border-white/10">
-                        <i className="fa-solid fa-shield-halved text-6xl text-gold mb-10"></i>
-                        <input type="password" autoFocus placeholder="PIN GESTOR" className="w-full bg-black/20 border-none p-6 rounded-2xl text-center text-4xl text-gold focus:outline-none mb-10 font-mono" onChange={e => { if(e.target.value === CONFIG.adminPass) setView("admin"); }} />
-                        <button onClick={() => setView("home")} className="text-white/30 text-[10px] font-black uppercase tracking-widest">Sair do Painel</button>
-                    </div>
-                </div>
-            );
-
-            if(view === "admin") return (
-                <div className="h-screen bg-blue-50 flex flex-col">
-                    <div className="bg-[#002060] p-10 pt-16 text-white flex justify-between items-center shadow-2xl">
-                        <div>
-                            <h2 className="font-black text-2xl tracking-tighter text-gold italic uppercase">Gestão Cleam</h2>
-                            <p className="text-[10px] opacity-40 uppercase font-black tracking-widest">{CONFIG.unidade}</p>
-                        </div>
-                        <button onClick={() => setView("home")} className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center active-tap"><i className="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                        <div className="bg-white p-8 rounded-[3.5rem] shadow-sm border border-blue-100">
-                            <h3 className="font-black mb-6 text-[#002060] text-xs flex items-center gap-2 uppercase tracking-widest"><i className="fa-solid fa-plus-circle text-gold"></i> Novo Colaborador</h3>
-                            <div className="flex gap-4 mb-6">
-                                <div className="w-24 h-24 bg-blue-50 rounded-3xl border-2 border-dashed border-blue-200 flex flex-col items-center justify-center text-blue-300 relative cursor-pointer" onClick={() => document.getElementById("f_in").click()}>
-                                    <input type="file" id="f_in" className="hidden" accept="image/*" onChange={e => {
-                                        const reader = new FileReader(); 
-                                        reader.onloadend = () => { 
-                                            window.lp = reader.result; 
-                                            const img = document.getElementById("p_v");
-                                            img.src = reader.result; 
-                                            img.classList.remove("hidden"); 
-                                        };
-                                        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-                                    }} />
-                                    <i className="fa-solid fa-camera mb-1"></i><span className="text-[7px] font-black uppercase">Foto</span>
-                                    <img id="p_v" className="hidden absolute inset-0 w-full h-full object-cover rounded-3xl" />
-                                </div>
-                                <div className="flex-1 space-y-3">
-                                    <input id="n_in" placeholder="Nome Completo" className="w-full bg-blue-50/50 p-4 rounded-xl text-sm border-none focus:ring-1 ring-gold" />
-                                    <input id="f_in_job" placeholder="Cargo/Função" className="w-full bg-blue-50/50 p-4 rounded-xl text-sm border-none focus:ring-1 ring-gold" />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 mb-6">
-                                <input id="cpf" placeholder="CPF" className="bg-blue-50/50 p-3 rounded-xl text-xs border-none" />
-                                <input id="pis" placeholder="PIS/PASEP" className="bg-blue-50/50 p-3 rounded-xl text-xs border-none" />
-                                <input id="adm" placeholder="Admissão" className="bg-blue-50/50 p-3 rounded-xl text-xs border-none" />
-                                <input id="hor" placeholder="Horário" className="bg-blue-50/50 p-3 rounded-xl text-xs border-none" />
-                            </div>
-                            <button onClick={() => {
-                                const n = document.getElementById("n_in").value; 
-                                const f = document.getElementById("f_in_job").value;
-                                if(!n || !f) return alert("Nome e Cargo são obrigatórios!");
-                                Storage.saveUsers([...Storage.getUsers(), {
-                                    id: Date.now(), 
-                                    nome: n, 
-                                    funcao: f, 
-                                    cpf: document.getElementById("cpf").value, 
-                                    pis: document.getElementById("pis").value, 
-                                    admissao: document.getElementById("adm").value, 
-                                    horario: document.getElementById("hor").value, 
-                                    foto: window.lp || null
-                                }]);
-                                window.lp = null;
-                                setView("admin");
-                            }} className="w-full bg-[#002060] text-white font-black py-5 rounded-2xl shadow-xl active-tap">CADASTRAR</button>
-                        </div>
-                        <div className="space-y-4 pb-20">
-                            <h3 className="text-[10px] font-black text-blue-300 uppercase tracking-widest px-6 italic">Equipe Registrada</h3>
-                            {Storage.getUsers().map(u => (
-                                <div key={u.id} className="bg-white p-5 rounded-[2.5rem] flex justify-between items-center shadow-sm border border-blue-50">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-blue-50 border border-gold flex-shrink-0">
-                                            {u.foto ? <img src={u.foto} className="w-full h-full object-cover" /> : <i className="fa-solid fa-user text-blue-100 mt-3 ml-3"></i>}
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-[#002060] text-sm uppercase leading-tight">{u.nome}</p>
-                                            <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">{u.funcao}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => checkAuth(() => {
-                                            const { jsPDF } = window.jspdf; 
-                                            const doc = new jsPDF("p", "mm", "a4");
-                                            const logs = Storage.getLogs().filter(l => l.userId === u.id);
-                                            const azul = [0, 32, 96]; 
-                                            const laranja = [255, 107, 0];
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
